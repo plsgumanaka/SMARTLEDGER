@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transactions</title>
+    <link rel="stylesheet" href="../css/transactions.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: rgb(40, 36, 61);
+            color: #e0e0e7;
+            padding: 32px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Summary cards section for totals and counts */
+        .summary-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+        }
+
+        .summary-card {
+            background: rgb(49, 45, 75);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(168, 85, 247, 0.1);
+            transition: all 0.3s;
+        }
+
+        .summary-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            border-color: #4a4a5e;
+        }
+
+        .summary-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #9ca3af;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .summary-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #e0e0e7;
+            margin-bottom: 4px;
+        }
+
+        .summary-detail {
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .summary-income {
+            border-left: 4px solid #22c55e;
+        }
+
+        /* Color the Total Income amount text green */
+        .summary-income .summary-value {
+            color: #22c55e;
+        }
+
+        .summary-expense {
+            border-left: 4px solid #ef4444;
+        }
+
+        /* Color the Total Expenses amount text red */
+        .summary-expense .summary-value {
+            color: #ef4444;
+        }
+
+        .summary-net {
+            border-left: 4px solid #a855f7;
+        }
+
+        /* Color the Net Amount text green */
+        .summary-net .summary-value {
+            color: #22c55e;
+        }
+
+        .summary-count {
+            border-left: 4px solid #3b82f6;
+        }
+
+        /* Search and action bar */
+        .search-bar {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .search-input {
+            flex: 1;
+            background: rgb(49, 45, 75);
+            border: 1px solid rgba(168, 85, 247, 0.1);
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #e0e0e7;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .search-input::placeholder {
+            color: #9ca3af;
+        }
+
+        .search-input:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            border-color: #4a4a5e;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #a855f7;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #9333ea;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #e0e0e7;
+            border: 1px solid rgba(168, 85, 247, 0.1);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(168, 85, 247, 0.05);
+        }
+
+        /* Toast notification styling */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgb(49, 45, 75);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 8px;
+            padding: 16px 20px;
+            color: #e0e0e7;
+            font-size: 14px;
+            z-index: 10002;
+            animation: slideIn 0.3s ease-out;
+            max-width: 300px;
+        }
+
+        .toast.success {
+            border-left: 4px solid #22c55e;
+        }
+
+        .toast.error {
+            border-left: 4px solid #ef4444;
+        }
+
+        .toast.info {
+            border-left: 4px solid #3b82f6;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(400px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* Filters section */
+        .filters-section {
+            background: rgb(49, 45, 75);
+            border-radius: 8px;
+            padding: 16px 24px;
+            border: 1px solid rgba(168, 85, 247, 0.1);
+            transition: all 0.3s;
+        }
+
+        .filters-section:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            border-color: #4a4a5e;
+        }
+
+        .filters-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            color: #e0e0e7;
+            font-weight: 600;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        /* Clear filters button */
+        .clear-filters-btn {
+            background: transparent;
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            color: #9ca3af;
+            padding: 6px 12px;
+            font-size: 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .clear-filters-btn:hover {
+            border-color: #a855f7;
+            color: #a855f7;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .filter-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #9ca3af;
+            text-transform: uppercase;
+        }
+
+        .custom-dropdown-wrapper {
+            position: relative;
+        }
+
+        .filter-select {
+            display: none;
+        }
+
+        .custom-dropdown-trigger {
+            background: rgb(30, 30, 46);
+            border: 1px solid rgba(168, 85, 247, 0.1);
+            border-radius: 6px;
+            padding: 10px 12px;
+            color: #e0e0e7;
+            font-size: 14px;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .custom-dropdown-trigger:hover {
+            background-color: rgb(35, 35, 55);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            border-color: #4a4a5e;
+        }
+
+        .custom-dropdown-trigger.active {
+            border-color: #a855f7;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .dropdown-arrow {
+            font-size: 12px;
+            color: #9ca3af;
+            transition: transform 0.3s;
+        }
+
+        .custom-dropdown-trigger.active .dropdown-arrow {
+            transform: rotate(180deg);
+        }
+
+        .custom-dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgb(30, 30, 46);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-top: none;
+            border-radius: 0 0 6px 6px;
+            margin-top: -1px;
+            z-index: 9999;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .custom-dropdown-menu::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .custom-dropdown-menu::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .custom-dropdown-menu::-webkit-scrollbar-thumb {
+            background: #a855f7;
+            border-radius: 4px;
+        }
+
+        .custom-dropdown-menu.open {
+            display: block;
+        }
+
+        .dropdown-option {
+            padding: 10px 12px;
+            color: #e0e0e7;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+            border-bottom: 1px solid rgba(168, 85, 247, 0.05);
+        }
+
+        .dropdown-option:hover {
+            background: rgba(168, 85, 247, 0.1);
+        }
+
+        .dropdown-option.selected {
+            background: rgba(168, 85, 247, 0.15);
+            color: #a855f7;
+        }
+
+        .dropdown-checkmark {
+            color: #a855f7;
+            font-size: 14px;
+            display: none;
+        }
+
+        .dropdown-option.selected .dropdown-checkmark {
+            display: inline;
+        }
+
+        /* Card and table styling */
+        .card {
+            background: rgb(49, 45, 75);
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid rgba(168, 85, 247, 0.1);
+            transition: all 0.3s;
+        }
+
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            border-color: #4a4a5e;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid rgba(168, 85, 247, 0.1);
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        /* Empty state styling */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6b7280;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.5;
+        }
+
+        .empty-state-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #e0e0e7;
+            margin-bottom: 8px;
+        }
+
+        .empty-state-message {
+            font-size: 14px;
+            color: #9ca3af;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            border-bottom: 1px solid rgba(168, 85, 247, 0.1);
+        }
+
+        th {
+            padding: 12px 16px;
+            text-align: left;
+            color: #9ca3af;
+            font-weight: 600;
+            font-size: 12px;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.3s;
+        }
+
+        th:hover {
+            color: #e0e0e7;
+        }
+
+        th.sortable:hover {
+            background: rgba(168, 85, 247, 0.05);
+        }
+
+        .sort-indicator {
+            display: inline-block;
+            margin-left: 4px;
+            font-size: 10px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        th.sort-asc .sort-indicator,
+        th.sort-desc .sort-indicator {
+            opacity: 1;
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid rgba(168, 85, 247, 0.1);
+        }
+
+        tr:hover {
+            background: rgba(168, 85, 247, 0.05);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Type badge styling */
+        .type-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .type-expense {
+            background: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+        }
+
+        .type-income {
+            background: rgba(34, 197, 94, 0.1);
+            color: #22c55e;
+        }
+
+        /* Category badge styling */
+        .category-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 4px;
+            background: rgba(168, 85, 247, 0.1);
+            color: #a855f7;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .amount-positive {
+            color: #22c55e;
+            font-weight: 600;
+        }
+
+        .amount-negative {
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .icon-button {
+            background: none;
+            border: none;
+            color: #9ca3af;
+            font-size: 18px;
+            cursor: pointer;
+            transition: color 0.3s;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-button:hover {
+            color: #a855f7;
+        }
+
+        /* Modal styles for Add Transaction */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.open {
+            display: flex;
+        }
+
+        .modal-content {
+            background: rgb(49, 45, 75);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 420px;
+            width: 90%;
+            max-height: auto;
+            overflow: visible;
+            position: relative;
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(168, 85, 247, 0.1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #e0e0e7;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #9ca3af;
+            transition: color 0.3s;
+        }
+
+        .modal-close:hover {
+            color: #e0e0e7;
+        }
+
+        .modal-body {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-label {
+            font-size: 12px;
+            font-weight: 600;
+            color: #9ca3af;
+            text-transform: uppercase;
+        }
+
+        .type-selector {
+            display: flex;
+            gap: 12px;
+        }
+
+        .type-btn {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            background: rgb(30, 30, 46);
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #9ca3af;
+        }
+
+        .type-btn.active {
+            background: #a855f7;
+            color: white;
+            border-color: #a855f7;
+        }
+
+        .type-btn:hover {
+            border-color: #a855f7;
+        }
+
+        .form-input {
+            padding: 8px 12px;
+            border: 1px solid rgba(168, 85, 247, 0.1);
+            border-radius: 6px;
+            font-size: 13px;
+            color: #e0e0e7;
+            background: rgb(30, 30, 46);
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #a855f7;
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: #6b7280;
+        }
+
+        /* Apply enhanced date picker styling to filter date inputs */
+        .filter-group input[type="date"] {
+            cursor: pointer;
+            padding: 10px 14px;
+            border: 1.5px solid rgba(168, 85, 247, 0.2);
+            border-radius: 8px;
+            font-size: 13px;
+            color: #e0e0e7;
+            background: rgba(30, 30, 46, 0.7);
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .filter-group input[type="date"]:hover {
+            border-color: rgba(168, 85, 247, 0.4);
+            background: rgba(30, 30, 46, 0.9);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .filter-group input[type="date"]:focus {
+            outline: none;
+            border-color: #a855f7;
+            background: rgb(30, 30, 46);
+            box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.15);
+        }
+
+        .form-textarea {
+            padding: 8px 12px;
+            border: 1px solid rgba(168, 85, 247, 0.1);
+            border-radius: 6px;
+            font-size: 13px;
+            color: #e0e0e7;
+            background: rgb(30, 30, 46);
+            font-family: inherit;
+            resize: none;
+            min-height: 60px;
+            transition: all 0.3s;
+        }
+
+        .form-textarea:focus {
+            outline: none;
+            border-color: #a855f7;
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1);
+        }
+
+        .form-textarea::placeholder {
+            color: #6b7280;
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(168, 85, 247, 0.1);
+            border-radius: 6px;
+            background: rgb(30, 30, 46);
+            cursor: pointer;
+        }
+
+        .file-input-wrapper input[type="file"] {
+            display: none;
+        }
+
+        .file-input-label {
+            display: block;
+            padding: 8px 12px;
+            cursor: pointer;
+            color: #e0e0e7;
+            font-size: 13px;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 10px 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .modal-btn-primary {
+            background: #a855f7;
+            color: white;
+        }
+
+        .modal-btn-primary:hover {
+            background: #9333ea;
+        }
+
+        .modal-btn-secondary {
+            background: rgb(30, 30, 46);
+            color: #e0e0e7;
+            border: 1px solid rgba(168, 85, 247, 0.1);
+        }
+
+        .modal-btn-secondary:hover {
+            background: rgba(168, 85, 247, 0.1);
+        }
+
+        /* Add custom amount input wrapper and spinner styling */
+        .amount-input-wrapper {
+            display: flex;
+            align-items: center;
+            border: 1px solid rgba(168, 85, 247, 0.1);
+            border-radius: 6px;
+            background: rgb(30, 30, 46);
+            transition: all 0.3s;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        .amount-input-wrapper:focus-within {
+            border-color: #a855f7;
+            box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.1);
+        }
+
+        .amount-currency {
+            padding: 8px 12px;
+            color: #a855f7;
+            font-weight: 600;
+            user-select: none;
+            flex-shrink: 0;
+        }
+
+        #amountInput, #editAmountInput {
+            flex: 1;
+            border: none;
+            background: transparent;
+            padding: 8px 0;
+            font-size: 13px;
+            color: #e0e0e7;
+            -webkit-appearance: none;
+            -moz-appearance: textfield;
+        }
+
+        #amountInput:focus, #editAmountInput:focus {
+            outline: none;
+        }
+
+        #amountInput::-webkit-outer-spin-button,
+        #amountInput::-webkit-inner-spin-button,
+        #editAmountInput::-webkit-outer-spin-button,
+        #editAmountInput::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Add custom amount input wrapper and spinner styling */
+        .amount-spinners {
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid rgba(168, 85, 247, 0.1);
+            padding: 2px;
+            gap: 2px;
+            flex-shrink: 0;
+        }
+
+        .spinner-btn {
+            width: 24px;
+            height: 16px;
+            border: none;
+            background: rgba(168, 85, 247, 0.1);
+            color: #a855f7;
+            cursor: pointer;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            padding: 0;
+        }
+
+        .spinner-btn:hover {
+            background: rgba(168, 85, 247, 0.2);
+        }
+
+        .spinner-btn:active {
+            background: #a855f7;
+            color: white;
+        }
+
+        /* Add custom amount input wrapper and spinner styling */
+        .date-picker-wrapper {
+            position: relative;
+        }
+
+        /* Enhanced date picker input styling with better visual hierarchy */
+        .date-picker-input {
+            cursor: pointer;
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid rgba(168, 85, 247, 0.2);
+            border-radius: 8px;
+            font-size: 13px;
+            color: #e0e0e7;
+            background: rgba(30, 30, 46, 0.7);
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .date-picker-input:hover {
+            border-color: rgba(168, 85, 247, 0.4);
+            background: rgba(30, 30, 46, 0.9);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .date-picker-input:focus {
+            outline: none;
+            border-color: #a855f7;
+            background: rgb(30, 30, 46);
+            box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.15);
+        }
+
+        .date-picker-input::placeholder {
+            color: #6b7280;
+        }
+        
+        /* Enhanced calendar picker styling with better visual hierarchy */
+        .calendar-picker {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgb(49, 45, 75);
+            border: 1.5px solid rgba(168, 85, 247, 0.3);
+            border-radius: 10px;
+            padding: 12px;
+            margin-top: 10px;
+            z-index: 10001;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            display: none; /* Initially hidden */
+            width: 250px;
+            /* Reduced width and padding for more compact calendar */
+        }
+
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            /* Reduced margin-bottom */
+        }
+
+        .calendar-nav-btn {
+            background: none;
+            border: none;
+            color: #a855f7;
+            font-size: 14px;
+            /* Reduced font-size */
+            cursor: pointer;
+            padding: 2px 4px;
+            /* Reduced padding */
+            transition: color 0.3s;
+        }
+
+        .calendar-month-year {
+            display: flex;
+            gap: 4px;
+            /* Reduced gap */
+            font-weight: 600;
+            color: #e0e0e7;
+            font-size: 11px;
+            /* Reduced font-size */
+        }
+
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            /* Reduced gap */
+            margin-bottom: 4px;
+            /* Reduced margin-bottom */
+            text-align: center;
+        }
+
+        .calendar-weekdays div {
+            font-size: 9px;
+            /* Reduced font-size */
+            font-weight: 600;
+            color: #9ca3af;
+            padding: 1px;
+            /* Reduced padding */
+        }
+
+        .calendar-days {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 1px;
+            /* Reduced gap */
+            margin-bottom: 8px;
+            /* Reduced margin-bottom */
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 3px;
+            /* Slightly reduced border-radius */
+            font-size: 10px;
+            /* Reduced font-size */
+            background: rgb(30, 30, 46);
+            color: #e0e0e7;
+            border: 1px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .calendar-day:hover {
+            background: rgba(168, 85, 247, 0.15);
+        }
+
+        .calendar-day.other-month {
+            color: #6b7280;
+            background: transparent;
+        }
+
+        .calendar-day.today {
+            background: #a855f7;
+            color: white;
+            font-weight: 600;
+        }
+
+        .calendar-day.selected {
+            background: #a855f7;
+            color: white;
+            font-weight: 600;
+        }
+
+        .calendar-footer {
+            display: flex;
+            gap: 4px;
+            /* Reduced gap */
+        }
+
+        .calendar-action-btn {
+            flex: 1;
+            padding: 5px 6px;
+            /* Reduced padding */
+            border: 1px solid rgba(168, 85, 247, 0.1);
+            background: rgb(30, 30, 46);
+            color: #e0e0e7;
+            border-radius: 4px;
+            font-size: 10px;
+            /* Reduced font-size */
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .calendar-action-btn:hover {
+            background: rgba(168, 85, 247, 0.1);
+        }
+
+        .calendar-action-btn.primary {
+            background: #a855f7;
+            color: white;
+            border-color: #a855f7;
+        }
+
+        .calendar-action-btn.primary:hover {
+            background: #9333ea;
+        }
+
+        /* Add delete confirmation modal styles */
+        .delete-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 10001;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .delete-modal.open {
+            display: flex;
+        }
+
+        .delete-modal-content {
+            background: rgb(49, 45, 75);
+            border-radius: 12px;
+            padding: 28px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(168, 85, 247, 0.1);
+            text-align: center;
+        }
+
+        .delete-modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #e0e0e7;
+            margin-bottom: 12px;
+        }
+
+        .delete-modal-message {
+            font-size: 13px;
+            color: #9ca3af;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .delete-modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .delete-modal-btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 100px;
+        }
+
+        .delete-modal-btn-cancel {
+            background: transparent;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            color: #e0e0e7;
+        }
+
+        .delete-modal-btn-cancel:hover {
+            background: rgba(168, 85, 247, 0.1);
+            border-color: #a855f7;
+        }
+
+        .delete-modal-btn-delete {
+            background: #ef4444;
+            color: white;
+        }
+
+        .delete-modal-btn-delete:hover {
+            background: #dc2626;
+        }
+
+        /* Export modal styles */
+        .export-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 10001;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .export-modal.open {
+            display: flex;
+        }
+
+        .export-modal-content {
+            background: rgb(49, 45, 75);
+            border-radius: 12px;
+            padding: 28px;
+            max-width: 400px;
+            width: 90%;
+            box-shadow: 0 20px 25px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(168, 85, 247, 0.1);
+            text-align: center;
+        }
+
+        .export-modal-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #e0e0e7;
+            margin-bottom: 12px;
+        }
+
+        .export-modal-message {
+            font-size: 13px;
+            color: #9ca3af;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        /* Update modal buttons to flex wrap for 4 buttons */
+        .export-modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            margin-top: 24px;
+            flex-wrap: wrap;
+        }
+
+        .export-format-btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 100px;
+            background: #a855f7;
+            color: white;
+        }
+
+        .export-format-btn:hover {
+            background: #9333ea;
+        }
+
+        .export-format-btn.cancel {
+            background: transparent;
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            color: #e0e0e7;
+        }
+
+        .export-format-btn.cancel:hover {
+            background: rgba(168, 85, 247, 0.1);
+            border-color: #a855f7;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+
+            .search-bar {
+                flex-direction: column;
+            }
+
+            .filters-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .summary-section {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            table {
+                font-size: 12px;
+            }
+
+            td, th {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Summary cards showing totals and counts -->
+        <div class="summary-section">
+            <div class="summary-card summary-income">
+                <div class="summary-label">Total Income</div>
+                <div class="summary-value" id="totalIncome">₱0.00</div>
+                <div class="summary-detail" id="incomeCount">0 transactions</div>
+            </div>
+            <div class="summary-card summary-expense">
+                <div class="summary-label">Total Expenses</div>
+                <div class="summary-value" id="totalExpense">₱0.00</div>
+                <div class="summary-detail" id="expenseCount">0 transactions</div>
+            </div>
+            <div class="summary-card summary-net">
+                <div class="summary-label">Net Amount</div>
+                <div class="summary-value" id="netAmount">₱0.00</div>
+                <div class="summary-detail" id="allCount">0 total</div>
+            </div>
+        </div>
+
+        <div class="search-bar">
+            <input type="text" class="search-input" id="searchInput" placeholder="Search transactions...">
+            <button class="btn btn-primary" id="addTransactionBtn">+ Add Transaction</button>
+            <button class="btn btn-secondary" id="exportBtn">⬇ Export</button>
+        </div>
+
+        <div class="filters-section">
+            <div class="filters-header">
+                <span>⊞ Filters</span>
+                <!-- Clear all filters button -->
+                <button class="clear-filters-btn" id="clearFiltersBtn">Clear All</button>
+            </div>
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label class="filter-label">Type</label>
+                    <div class="custom-dropdown-wrapper">
+                        <select class="filter-select" id="typeFilter">
+                            <option>All Types</option>
+                            <option>Income</option>
+                            <option>Expense</option>
+                        </select>
+                        <div class="custom-dropdown-trigger" id="typeFilterTrigger" data-select="typeFilter">
+                            <span class="dropdown-label">All Types</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </div>
+                        <div class="custom-dropdown-menu" id="typeFilterMenu"></div>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Category</label>
+                    <div class="custom-dropdown-wrapper">
+                        <select class="filter-select" id="categoryFilter">
+                            <option>All Categories</option>
+                            <option>Groceries</option>
+                            <option>Dining</option>
+                            <option>Transport</option>
+                            <option>Entertainment</option>
+                            <option>Shopping</option>
+                            <option>Utilities</option>
+                            <option>Health</option>
+                            <option>Salary</option>
+                            <option>Freelance</option>
+                            <option>Other</option>
+                        </select>
+                        <div class="custom-dropdown-trigger" id="categoryFilterTrigger" data-select="categoryFilter">
+                            <span class="dropdown-label">All Categories</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </div>
+                        <div class="custom-dropdown-menu" id="categoryFilterMenu"></div>
+                    </div>
+                </div>
+                <!-- Date range filters -->
+                <div class="filter-group">
+                    <label class="filter-label">From Date</label>
+                    <div class="date-picker-wrapper">
+                        <input type="text" class="date-picker-input" id="fromDateFilter" placeholder="Select start date" readonly>
+                        <div class="calendar-picker" id="fromCalendarPicker">
+                            <div class="calendar-header">
+                                <button type="button" class="calendar-nav-btn" onclick="fromPreviousMonth()">&lt;</button>
+                                <div class="calendar-month-year">
+                                    <span id="fromCurrentMonth">November</span>
+                                    <span id="fromCurrentYear">2025</span>
+                                </div>
+                                <button type="button" class="calendar-nav-btn" onclick="fromNextMonth()">&gt;</button>
+                            </div>
+                            <div class="calendar-weekdays">
+                                <div class="weekday">Su</div>
+                                <div class="weekday">Mo</div>
+                                <div class="weekday">Tu</div>
+                                <div class="weekday">We</div>
+                                <div class="weekday">Th</div>
+                                <div class="weekday">Fr</div>
+                                <div class="weekday">Sa</div>
+                            </div>
+                            <div class="calendar-days" id="fromCalendarDays"></div>
+                            <div class="calendar-footer">
+                                <button type="button" class="calendar-action-btn calendar-clear-btn" onclick="fromClearDate()">Clear</button>
+                                <button type="button" class="calendar-action-btn calendar-today-btn" onclick="fromSetToday()">Today</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">To Date</label>
+                    <div class="date-picker-wrapper">
+                        <input type="text" class="date-picker-input" id="toDateFilter" placeholder="Select end date" readonly>
+                        <div class="calendar-picker" id="toCalendarPicker">
+                            <div class="calendar-header">
+                                <button type="button" class="calendar-nav-btn" onclick="toPreviousMonth()">&lt;</button>
+                                <div class="calendar-month-year">
+                                    <span id="toCurrentMonth">November</span>
+                                    <span id="toCurrentYear">2025</span>
+                                </div>
+                                <button type="button" class="calendar-nav-btn" onclick="toNextMonth()">&gt;</button>
+                            </div>
+                            <div class="calendar-weekdays">
+                                <div class="weekday">Su</div>
+                                <div class="weekday">Mo</div>
+                                <div class="weekday">Tu</div>
+                                <div class="weekday">We</div>
+                                <div class="weekday">Th</div>
+                                <div class="weekday">Fr</div>
+                                <div class="weekday">Sa</div>
+                            </div>
+                            <div class="calendar-days" id="toCalendarDays"></div>
+                            <div class="calendar-footer">
+                                <button type="button" class="calendar-action-btn calendar-clear-btn" onclick="toClearDate()">Clear</button>
+                                <button type="button" class="calendar-action-btn calendar-today-btn" onclick="toSetToday()">Today</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">All Transactions</h3>
+            </div>
+            <div id="tableContainer">
+                <table id="transactionsTable">
+                    <thead>
+                        <tr>
+                            <!-- Made headers sortable with click handlers -->
+                            <th class="sortable" onclick="sortTable('date')">Date <span class="sort-indicator" id="dateSort">▲</span></th>
+                            <th>Type</th>
+                            <th>Category</th>
+                            <th>Description</th>
+                            <th class="sortable" onclick="sortTable('amount')">Amount <span class="sort-indicator" id="amountSort">▲</span></th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>2025-11-04</td>
+                            <td><span class="type-badge type-expense">Expense</span></td>
+                            <td><span class="category-badge">Groceries</span></td>
+                            <td>Weekly groceries</td>
+                            <td class="amount-negative">₱461.48</td>
+                            <td>
+                                <div class="actions">
+                                    <button type="button" class="icon-button edit-transaction">✎</button>
+                                    <button type="button" class="icon-button delete-transaction">🗑</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2025-11-03</td>
+                            <td><span class="type-badge type-income">Income</span></td>
+                            <td><span class="category-badge">Salary</span></td>
+                            <td>Monthly salary</td>
+                            <td class="amount-positive">₱5,200.00</td>
+                            <td>
+                                <div class="actions">
+                                    <button type="button" class="icon-button edit-transaction">✎</button>
+                                    <button type="button" class="icon-button delete-transaction">🗑</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>2025-11-02</td>
+                            <td><span class="type-badge type-expense">Expense</span></td>
+                            <td><span class="category-badge">Dining</span></td>
+                            <td>Lunch with friends</td>
+                            <td class="amount-negative">₱125.50</td>
+                            <td>
+                                <div class="actions">
+                                    <button type="button" class="icon-button edit-transaction">✎</button>
+                                    <button type="button" class="icon-button delete-transaction">🗑</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                <!-- Empty state placeholder -->
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <div class="empty-state-icon">📭</div>
+                    <div class="empty-state-title">No Transactions Found</div>
+                    <div class="empty-state-message">Try adjusting your filters or add a new transaction to get started</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Transaction Modal -->
+    <div class="modal" id="addTransactionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Add New Transaction</h2>
+                <button type="button" class="modal-close" id="closeAddModal">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Type</label>
+                    <div class="type-selector">
+                        <button type="button" class="type-btn active">Expense</button>
+                        <button type="button" class="type-btn">Income</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Amount</label>
+                    <div class="amount-input-wrapper">
+                        <span class="amount-currency">₱</span>
+                        <input type="number" class="form-input" id="amountInput" placeholder="0.00" step="0.01" min="0">
+                        <div class="amount-spinners">
+                            <button type="button" class="spinner-btn" id="incrementAmountBtn">▲</button>
+                            <button type="button" class="spinner-btn" id="decrementAmountBtn">▼</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <div class="custom-dropdown-wrapper">
+                        <select class="filter-select" id="modalCategorySelect">
+                            <option>Select category</option>
+                        </select>
+                        <div class="custom-dropdown-trigger" id="modalCategoryTrigger" data-select="modalCategorySelect">
+                            <span class="dropdown-label">Select category</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </div>
+                        <div class="custom-dropdown-menu" id="modalCategoryMenu"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Date</label>
+                    <div class="date-picker-wrapper">
+                        <input type="text" class="form-input date-picker-input" id="dateInput" placeholder="Select date" readonly>
+                        <div class="calendar-picker" id="calendarPicker">
+                            <div class="calendar-header">
+                                <button type="button" class="calendar-nav-btn" onclick="previousMonth()">&lt;</button>
+                                <div class="calendar-month-year">
+                                    <span id="currentMonth">November</span>
+                                    <span id="currentYear">2025</span>
+                                </div>
+                                <button type="button" class="calendar-nav-btn" onclick="nextMonth()">&gt;</button>
+                            </div>
+                            <div class="calendar-weekdays">
+                                <div>Su</div>
+                                <div>Mo</div>
+                                <div>Tu</div>
+                                <div>We</div>
+                                <div>Th</div>
+                                <div>Fr</div>
+                                <div>Sa</div>
+                            </div>
+                            <div class="calendar-days" id="calendarDays"></div>
+                            <div class="calendar-footer">
+                                <button type="button" class="calendar-action-btn" onclick="clearDate()">Clear</button>
+                                <button type="button" class="calendar-action-btn primary" onclick="setToday()">Today</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-textarea" id="descriptionInput" placeholder="Enter description..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Attachment (Optional)</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="fileInput">
+                        <label class="file-input-label" for="fileInput">Choose File</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="modal-btn modal-btn-primary" id="saveTransactionBtn">Save Transaction</button>
+                <button type="button" class="modal-btn modal-btn-secondary" id="cancelAdd">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Edit Transaction Modal -->
+    <div class="modal" id="editTransactionModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Edit Transaction</h2>
+                <button type="button" class="modal-close" id="closeEditModal">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">Type</label>
+                    <div class="type-selector">
+                        <button type="button" class="type-btn active">Expense</button>
+                        <button type="button" class="type-btn">Income</button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Amount</label>
+                    <div class="amount-input-wrapper">
+                        <span class="amount-currency">₱</span>
+                        <input type="number" id="editAmountInput" placeholder="0.00" step="0.01" min="0">
+                        <div class="amount-spinners">
+                            <button type="button" class="spinner-btn" id="incrementEditAmountBtn">▲</button>
+                            <button type="button" class="spinner-btn" id="decrementEditAmountBtn">▼</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Category</label>
+                    <div class="custom-dropdown-wrapper">
+                        <select class="filter-select" id="editModalCategorySelect">
+                            <option>Select category</option>
+                        </select>
+                        <div class="custom-dropdown-trigger" id="editModalCategoryTrigger" data-select="editModalCategorySelect">
+                            <span class="dropdown-label">Select category</span>
+                            <span class="dropdown-arrow">▼</span>
+                        </div>
+                        <div class="custom-dropdown-menu" id="editModalCategoryMenu"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Date</label>
+                    <div class="date-picker-wrapper">
+                        <input type="text" class="form-input date-picker-input" id="editDateInput" placeholder="Select date" readonly>
+                        <div class="calendar-picker" id="editCalendarPicker">
+                            <div class="calendar-header">
+                                <button type="button" class="calendar-nav-btn" onclick="editPreviousMonth()">&lt;</button>
+                                <div class="calendar-month-year">
+                                    <span id="editCurrentMonth">November</span>
+                                    <span id="editCurrentYear">2025</span>
+                                </div>
+                                <button type="button" class="calendar-nav-btn" onclick="editNextMonth()">&gt;</button>
+                            </div>
+                            <div class="calendar-weekdays">
+                                <div>Su</div>
+                                <div>Mo</div>
+                                <div>Tu</div>
+                                <div>We</div>
+                                <div>Th</div>
+                                <div>Fr</div>
+                                <div>Sa</div>
+                            </div>
+                            <div class="calendar-days" id="editCalendarDays"></div>
+                            <div class="calendar-footer">
+                                <button type="button" class="calendar-action-btn" onclick="editClearDate()">Clear</button>
+                                <button type="button" class="calendar-action-btn primary" onclick="editSetToday()">Today</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Description</label>
+                    <textarea class="form-textarea" id="editDescriptionInput" placeholder="Enter description..."></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Attachment (Optional)</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="editFileInput">
+                        <label class="file-input-label" for="editFileInput">Choose File</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="modal-btn modal-btn-primary" id="updateTransactionBtn">Update Transaction</button>
+                <button type="button" class="modal-btn modal-btn-secondary" id="cancelEdit">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="delete-modal" id="deleteTransactionModal">
+        <div class="delete-modal-content">
+            <button type="button" class="modal-close" id="closeDeleteModal">✕</button>
+            <h2 class="delete-modal-title">Are you sure?</h2>
+            <p class="delete-modal-message">This action cannot be undone. This will permanently delete the transaction.</p>
+            <div class="delete-modal-buttons">
+                <button type="button" class="delete-modal-btn delete-modal-btn-cancel" id="cancelDeleteBtn">Cancel</button>
+                <button type="button" class="delete-modal-btn delete-modal-btn-delete" id="confirmDeleteBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div class="export-modal" id="exportModal">
+        <div class="export-modal-content">
+            <h2 class="export-modal-title">Export Transactions</h2>
+            <p style="color: #9ca3af; font-size: 13px; margin-bottom: 24px;">Choose a format to download your transactions:</p>
+            <div class="export-modal-buttons">
+                <button class="export-format-btn" onclick="exportAsPDF()">PDF</button>
+                <button class="export-format-btn" onclick="exportAsCSV()">CSV</button>
+                <button class="export-format-btn" onclick="exportAsJSON()">JSON</button>
+                <button class="export-format-btn cancel" onclick="closeExportModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/transactions.js"></script>
+</body>
+</html>

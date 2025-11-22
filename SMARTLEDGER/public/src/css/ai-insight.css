@@ -1,0 +1,344 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: rgb(40, 36, 61);
+    color: #e0e0e7;
+    padding: 32px;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.header-content h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #e0e0e7;
+}
+
+.header-content p {
+    font-size: 14px;
+    color: #9ca3af;
+}
+
+.card {
+    background: rgb(49, 45, 75);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid rgba(168, 85, 247, 0.1);
+    transition: all 0.3s;
+    margin-bottom: 24px;
+}
+
+.card:last-child {
+    margin-bottom: 0;
+}
+
+.card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    border-color: #4a4a5e;
+}
+
+.card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #e0e0e7;
+    margin-bottom: 16px;
+}
+
+.summary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 24px;
+    margin-bottom: 24px;
+}
+
+.summary-card {
+    background: rgb(49, 45, 75);
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid rgba(168, 85, 247, 0.1);
+    transition: all 0.3s;
+}
+
+.summary-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    border-color: #4a4a5e;
+}
+
+.summary-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.summary-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #e0e0e7;
+    margin-bottom: 4px;
+}
+
+.summary-value.success {
+    color: #22c55e;
+}
+
+.summary-detail {
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+.insight-card {
+    border: 1px solid rgba(168, 85, 247, 0.1);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 16px;
+    background: rgba(168, 85, 247, 0.05);
+}
+
+.insight-card.warning {
+    border-color: rgba(239, 68, 68, 0.2);
+    background: rgba(239, 68, 68, 0.05);
+}
+
+.insight-card.success {
+    border-color: rgba(34, 197, 94, 0.2);
+    background: rgba(34, 197, 94, 0.05);
+}
+
+.insight-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.insight-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+    background: rgba(168, 85, 247, 0.1);
+}
+
+.insight-card.warning .insight-icon {
+    background: rgba(239, 68, 68, 0.1);
+}
+
+.insight-card.success .insight-icon {
+    background: rgba(34, 197, 94, 0.1);
+}
+
+.insight-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.insight-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: #e0e0e7;
+    margin-bottom: 8px;
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+    background: rgba(168, 85, 247, 0.15);
+    color: #a855f7;
+    border: 1px solid rgba(168, 85, 247, 0.2);
+    white-space: nowrap;
+}
+
+.badge-high {
+    background: rgba(239, 68, 68, 0.15);
+    color: #ef4444;
+    border-color: rgba(239, 68, 68, 0.2);
+}
+
+.badge-medium {
+    background: rgba(251, 146, 60, 0.15);
+    color: #f97316;
+    border-color: rgba(251, 146, 60, 0.2);
+}
+
+.insight-description {
+    font-size: 13px;
+    color: #9ca3af;
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+
+.savings-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 12px;
+    border-radius: 6px;
+    background: rgba(34, 197, 94, 0.1);
+    border: 1px solid rgba(34, 197, 94, 0.2);
+    font-size: 13px;
+    color: #22c55e;
+}
+
+.spending-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.spending-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px solid rgba(168, 85, 247, 0.05);
+}
+
+.spending-item:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.spending-category {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.spending-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #e0e0e7;
+}
+
+.spending-amount {
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+.spending-trend {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+}
+
+.trend-up {
+    color: #ef4444;
+}
+
+.trend-down {
+    color: #22c55e;
+}
+
+.trend-stable {
+    color: #9ca3af;
+}
+
+.prediction-item {
+    margin-bottom: 20px;
+}
+
+.prediction-item:last-child {
+    margin-bottom: 0;
+}
+
+.prediction-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 8px;
+}
+
+.prediction-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #e0e0e7;
+}
+
+.prediction-detail {
+    font-size: 11px;
+    color: #9ca3af;
+    margin-top: 2px;
+}
+
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: rgba(168, 85, 247, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 8px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: #a855f7;
+    border-radius: 4px;
+    transition: width 0.3s;
+}
+
+.chart-container {
+    position: relative;
+    height: 300px;
+    margin-bottom: 0;
+}
+
+.two-col-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-bottom: 32px;
+}
+
+/* Added .fi utility class */
+.fi {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+}
+
+@media (max-width: 768px) {
+    .two-col-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .header {
+        flex-direction: column;
+        gap: 16px;
+    }
+}
+

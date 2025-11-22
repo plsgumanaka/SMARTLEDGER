@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload Receipt</title>
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.1.0/uicons-regular-rounded/css/uicons-regular-rounded.css'>
+    <link rel="stylesheet" href="../css/receipt.css">
+</head>
+<body>
+    <!-- Added toast container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <h1>Upload Receipt</h1>
+                <p>Upload receipt images and let AI extract transaction details automatically</p>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" id="exportBtn" onclick="exportReceipts()">⬇ Export All</button>
+            </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-content">
+                    <div class="stat-label"><i class="fi fi-rr-document"></i> Total Receipts</div>
+                    <h3 id="totalReceipts">0</h3>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-content">
+                    <div class="stat-label"><i class="fi fi-rr-calendar"></i> This Month</div>
+                    <h3 id="thisMonth">0</h3>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-content">
+                    <div class="stat-label"><i class="fi fi-rr-money-bill-wave"></i> Total Amount</div>
+                    <h3 id="totalAmount">₱0.00</h3>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-content">
+                    <div class="stat-label"><i class="fi fi-rr-check"></i> Avg Confidence</div>
+                    <h3 id="avgConfidence">0.0%</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('upload', this)"><i class="fi fi-rr-upload"></i> Upload Receipt</button>
+            <button class="tab" onclick="switchTab('history', this)"><i class="fi fi-rr-time-past"></i> Receipt History</button>
+        </div>
+
+        <!-- Upload Tab -->
+        <div id="upload" class="tab-content active">
+            <div class="upload-grid">
+                <!-- Upload Section -->
+                <div class="card">
+                    <div class="card-title">Upload Receipt Image</div>
+                    <div class="dropzone" id="dropzone" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+                        <div class="upload-icon"><i class="fi fi-rr-camera"></i></div>
+                        <div class="upload-text">
+                            <h3>Drop your receipt here</h3>
+                            <p>or click to browse from your device</p>
+                        </div>
+                        <input type="file" id="fileInput" class="input-hidden" accept="image/*,.pdf" onchange="handleFileSelect(event)">
+                        <div class="btn-group">
+                            <button class="btn btn-primary" onclick="document.getElementById('fileInput').click();"><i class="fi fi-rr-folder"></i> Choose File</button>
+                            <button class="btn btn-secondary" onclick="openCamera();"><i class="fi fi-rr-camera"></i> Camera</button>
+                        </div>
+                        <div class="upload-tips">
+                            <strong>Tips for best results:</strong>
+                            <ul>
+                                <li>Ensure receipt is well-lit and in focus</li>
+                                <li>Capture the entire receipt including totals</li>
+                                <li>Avoid shadows and glare</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div id="fileUploadedSection" class="hidden">
+                        <div class="success-message"><i class="fi fi-rr-check"></i> Receipt uploaded successfully!</div>
+                        <div class="file-info">
+                            <div class="file-icon"><i class="fi fi-rr-document"></i></div>
+                            <div class="file-details">
+                                <div class="file-name" id="uploadedFileName">receipt.jpg</div>
+                                <div class="file-size" id="uploadedFileSize">0 KB</div>
+                            </div>
+                            <button class="btn btn-secondary" onclick="resetUpload()" style="margin-left: auto;"><i class="fi fi-rr-cross-small"></i></button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Extracted Data Section -->
+                <div class="card">
+                    <div class="card-title">Extracted Transaction Details</div>
+                    <div id="extractedDataForm" class="hidden">
+                        <div class="success-message"><i class="fi fi-rr-check"></i> Data extracted with <span id="confidenceScore">95%</span> confidence</div>
+
+                        <form onsubmit="saveReceipt(event)">
+                            <div class="form-group">
+                                <label class="form-label">Merchant / Description</label>
+                                <input type="text" class="form-input" id="merchant" name="merchant" placeholder="Enter merchant name" required>
+                            </div>
+
+                            <div class="form-row-2col">
+                                <div class="form-group">
+                                    <label class="form-label">Amount</label>
+                                    <input type="number" class="form-input" id="amount" name="amount" step="0.01" placeholder="0.00" required>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Date</label>
+                                    <input type="date" class="form-input" id="date" name="date" required>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Category</label>
+                                <select class="form-select" id="category" name="category" required>
+                                    <option value="groceries">Groceries</option>
+                                    <option value="dining">Dining</option>
+                                    <option value="transport">Transport</option>
+                                    <option value="entertainment">Entertainment</option>
+                                    <option value="shopping">Shopping</option>
+                                    <option value="utilities">Utilities</option>
+                                    <option value="health">Health</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group" id="itemsSection" style="display: none;">
+                                <label class="form-label">Detected Items</label>
+                                <div class="extracted-items" id="itemsList"></div>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Additional Notes (Optional)</label>
+                                <textarea class="form-textarea" id="notes" name="notes" placeholder="Add any additional notes..." rows="3"></textarea>
+                            </div>
+
+                            <div class="btn-group">
+                                <button type="submit" class="btn btn-primary" style="flex: 1;"><i class="fi fi-rr-check"></i> Save Transaction</button>
+                                <button type="button" class="btn btn-secondary" onclick="resetUpload()">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div id="emptyState" class="empty-state">
+                        <div class="empty-icon"><i class="fi fi-rr-clipboard"></i></div>
+                        <p style="color: #9ca3af;">Upload a receipt to extract transaction details</p>
+                        <p style="font-size: 12px; color: #9ca3af; margin-top: 8px;">AI will automatically detect merchant, amount, date, and items</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- History Tab -->
+        <div id="history" class="tab-content">
+            <div class="card" style="margin-bottom: 24px;">
+                <div style="display: flex; gap: 12px; align-items: center;">
+                    <input type="text" class="form-input" id="searchInput" placeholder="Search receipts..." style="flex: 1; margin: 0;" onkeyup="filterReceipts()">
+                    <select class="form-select" id="categoryFilter" style="width: 200px; margin: 0;" onchange="filterReceipts()">
+                        <option value="">All Categories</option>
+                        <option value="groceries">Groceries</option>
+                        <option value="dining">Dining</option>
+                        <option value="transport">Transport</option>
+                        <option value="entertainment">Entertainment</option>
+                        <option value="shopping">Shopping</option>
+                        <option value="utilities">Utilities</option>
+                        <option value="health">Health</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Receipt History</div>
+                <div id="receiptHistoryTable" class="empty-state">
+                    <div class="empty-icon"><i class="fi fi-rr-document"></i></div>
+                    <p style="color: #9ca3af;">No receipts uploaded yet</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/receipt.js"></script>
+</body>
+</html>

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.1.0/uicons-regular-rounded/css/uicons-regular-rounded.css'>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link rel="stylesheet" href="../css/dashboard.css">
+</head>
+<body>
+    <!-- Financial Health Score card at the top -->
+    <div class="grid-1" style="margin-bottom: 32px;">
+        <div class="card health-score-card">
+            <div class="health-score-content">
+                <div class="health-score-text">
+                    <div class="health-label">Financial Health Score</div>
+                    <div class="health-title">Excellent</div>
+                    <div class="health-message">You're saving ₱4,738.52 this month. Keep up the great work!</div>
+                </div>
+                <!-- Replaced emoji with Flaticon -->
+                <div class="health-icon">
+                    <i class="fi fi-rr-chart-histogram"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="action-buttons">
+        <!-- Changed onclick to send message to parent frame instead of direct navigation -->
+        <button class="btn-action primary" onclick="parent.postMessage({action: 'navigate', page: 'components/transactions.html'}, '*')">+ Add Expense</button>
+        <button class="btn-action secondary" onclick="parent.postMessage({action: 'navigate', page: 'components/transactions.html'}, '*')">+ Add Income</button>
+        <button class="btn-action secondary" onclick="parent.postMessage({action: 'navigate', page: 'components/budget.html'}, '*')">+ Plan Budget</button>
+        <button class="btn-action secondary" onclick="parent.postMessage({action: 'navigate', page: 'components/receipt.html'}, '*')">+ Upload Receipt</button>
+    </div>
+
+    <!-- Stat cards -->
+    <div class="grid-4">
+        <div class="card">
+            <div class="stat-card">
+                <!-- Updated layout to include settings icon and Flaticon icons -->
+                <div class="stat-card-top">
+                    <div class="stat-label-group">
+                        <div class="stat-label">Current</div>
+                        <div class="stat-label">Balance</div>
+                    </div>
+                    <div class="stat-icons">
+                        <button class="icon-btn" onclick="openBalanceModal()">
+                            <i class="fi fi-rr-settings"></i>
+                        </button>
+                        <i class="fi fi-rr-wallet stat-icon-large"></i>
+                    </div>
+                </div>
+                <div class="stat-header">
+                    <div class="stat-value" id="currentBalanceDisplay">₱15,588.52</div>
+                </div>
+                <div class="stat-footer">Updated just now</div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="stat-card">
+                <div class="stat-label">Total Income</div>
+                <div class="stat-header">
+                    <div class="stat-value green">₱5,200</div>
+                    <!-- Replaced emoji with Flaticon -->
+                    <span class="stat-icon trend-icon"><i class="fi fi-rr-arrow-trend-up"></i></span>
+                </div>
+                <div class="stat-footer">This month</div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="stat-card">
+                <div class="stat-label">Total Expenses</div>
+                <div class="stat-header">
+                    <div class="stat-value red">₱3,520</div>
+                    <!-- Replaced emoji with Flaticon -->
+                    <span class="stat-icon trend-icon"><i class="fi fi-rr-arrow-trend-down"></i></span>
+                </div>
+                <div class="stat-footer">This month</div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="stat-card">
+                <div class="stat-label">Net Cash Flow</div>
+                <div class="stat-header">
+                    <div class="stat-value green">₱1,680</div>
+                    <!-- Replaced emoji with Flaticon -->
+                    <span class="stat-icon"><i class="fi fi-rr-money-bill-wave"></i></span>
+                </div>
+                <div class="stat-footer">Income - Expenses</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Charts section -->
+    <div class="grid-2">
+        <div class="card chart-card">
+            <div class="card-header">Cash Flow Forecast</div>
+            <div class="chart-container">
+                <canvas id="cashFlowChart"></canvas>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-header">Spending by Category</div>
+            <div class="chart-container">
+                <canvas id="categoryChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transactions table -->
+    <div class="card transactions-table">
+        <div class="table-header">
+            <div class="table-title">Recent Transactions</div>
+            <!-- Updated to include click handler for View All link -->
+            <a class="table-link" onclick="parent.postMessage({action: 'navigate', page: 'components/transactions.html'}, '*'); return false;">View All</a>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Amount</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Nov 1</td>
+                    <td>Grocery Store</td>
+                    <td><span class="category-badge">Groceries</span></td>
+                    <td class="amount-negative">₱125.50</td>
+                </tr>
+                <tr>
+                    <td>Oct 31</td>
+                    <td>Salary Deposit</td>
+                    <td><span class="category-badge">Income</span></td>
+                    <td class="amount-positive">+₱5200.00</td>
+                </tr>
+                <tr>
+                    <td>Oct 30</td>
+                    <td>Restaurant</td>
+                    <td><span class="category-badge">Dining</span></td>
+                    <td class="amount-negative">₱65.00</td>
+                </tr>
+                <tr>
+                    <td>Oct 29</td>
+                    <td>Gas Station</td>
+                    <td><span class="category-badge">Transport</span></td>
+                    <td class="amount-negative">₱45.00</td>
+                </tr>
+                <tr>
+                    <td>Oct 28</td>
+                    <td>Netflix Subscription</td>
+                    <td><span class="category-badge">Entertainment</span></td>
+                    <td class="amount-negative">₱15.99</td>
+                </tr>
+                <tr>
+                    <td>Oct 27</td>
+                    <td>Online Shopping</td>
+                    <td><span class="category-badge">Shopping</span></td>
+                    <td class="amount-negative">₱89.99</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Added Modal HTML at the end of body -->
+    <div id="balanceModal" class="modal-overlay">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3>Edit Starting Balance</h3>
+                <button class="close-btn" onclick="closeModal()"><i class="fi fi-rr-cross-small"></i></button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label>Starting Balance</label>
+                    <div class="input-wrapper">
+                        <input type="number" id="startingBalanceInput" value="10000">
+                        <!-- Added custom arrow buttons -->
+                        <div class="number-arrows">
+                            <button type="button" class="arrow-btn" onclick="incrementBalance()">
+                                <i class="fi fi-rr-angle-small-up"></i>
+                            </button>
+                            <button type="button" class="arrow-btn" onclick="decrementBalance()">
+                                <i class="fi fi-rr-angle-small-down"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <p class="helper-text">This is your account balance before any tracked transactions. Current balance will be recalculated as: Starting Balance + Total Income - Total Expenses</p>
+                
+                <div class="balance-summary">
+                    <div class="summary-row">
+                        <span>Current Starting Balance:</span>
+                        <span id="modalStartingBalance">₱10,000.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>All-Time Income:</span>
+                        <span class="text-green">+₱6,050.00</span>
+                    </div>
+                    <div class="summary-row">
+                        <span>All-Time Expenses:</span>
+                        <span class="text-red">-₱461.48</span>
+                    </div>
+                    <div class="summary-row total">
+                        <span>Current Balance:</span>
+                        <span id="modalTotalBalance">₱15,588.52</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-modal primary" onclick="updateBalance()">Update Balance</button>
+                <button class="btn-modal secondary" onclick="closeModal()">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/dashboard.js"></script>
+</body>
+</html>

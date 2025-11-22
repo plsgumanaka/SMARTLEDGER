@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - SmartLedger</title>
+    <!-- Added Flaticon CDN -->
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.1.0/uicons-regular-rounded/css/uicons-regular-rounded.css'>
+    <link rel="stylesheet" href="../css/settings.css">
+</head>
+<body>
+    <!-- Added toast container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h2>Settings</h2>
+            <p>Manage your account settings and preferences</p>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tabs-list">
+                <button class="tab-trigger active" onclick="switchTab(event, 'profile')">
+                    <!-- Replaced emoji with Flaticon -->
+                    <span><i class="fi fi-rr-user"></i></span>
+                    <span>Profile</span>
+                </button>
+                <button class="tab-trigger" onclick="switchTab(event, 'notifications')">
+                    <!-- Replaced emoji with Flaticon -->
+                    <span><i class="fi fi-rr-bell"></i></span>
+                    <span>Notifications</span>
+                </button>
+                <button class="tab-trigger" onclick="switchTab(event, 'security')">
+                    <!-- Replaced emoji with Flaticon -->
+                    <span><i class="fi fi-rr-lock"></i></span>
+                    <span>Security</span>
+                </button>
+                <button class="tab-trigger" onclick="switchTab(event, 'data')">
+                    <!-- Replaced emoji with Flaticon -->
+                    <span><i class="fi fi-rr-credit-card"></i></span>
+                    <span>Data & Privacy</span>
+                </button>
+            </div>
+
+            <!-- Profile Tab -->
+            <div id="profile" class="tab-content active">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Profile Information</div>
+                        <div class="card-description">Update your personal information and profile details</div>
+                    </div>
+                    <div class="card-content">
+                        <form class="form-space">
+                            <div class="grid-2">
+                                <div class="form-group">
+                                    <label class="label">First Name</label>
+                                    <input type="text" class="input" value="John" id="firstName">
+                                </div>
+                                <div class="form-group">
+                                    <label class="label">Last Name</label>
+                                    <input type="text" class="input" value="Doe" id="lastName">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="label">Email Address</label>
+                                <input type="email" class="input" value="john.doe@email.com" id="email">
+                            </div>
+                            <div class="button-flex-end">
+                                <button type="button" class="button" onclick="saveProfile()">Save Changes</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Appearance</div>
+                        <div class="card-description">Customize how SmartLedger looks and feels</div>
+                    </div>
+                    <div class="card-content">
+                        <div class="switch-group">
+                            <div class="switch-label">
+                                <div style="display: flex; align-items: center; gap: 12px;">
+                                    <!-- Replaced emoji with Flaticon -->
+                                    <span style="font-size: 18px;"><i class="fi fi-rr-moon"></i></span>
+                                    <div>
+                                        <div class="switch-label-text">Dark Mode</div>
+                                        <div class="switch-label-desc">Enable dark theme across the application</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="toggle-switch active" onclick="toggleSwitch(this, 'darkMode')" id="darkModeToggle"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notifications Tab -->
+            <div id="notifications" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Notification Preferences</div>
+                        <div class="card-description">Choose how you want to be notified about important events</div>
+                    </div>
+                    <div class="card-content">
+                        <div class="switch-group">
+                            <div class="switch-label">
+                                <div class="switch-label-text">Email Notifications</div>
+                                <div class="switch-label-desc">Receive email updates about your account</div>
+                            </div>
+                            <div class="toggle-switch active" onclick="toggleSwitch(this, 'emailNotifications')" id="emailNotificationsToggle"></div>
+                        </div>
+                        <div class="separator"></div>
+                        <div class="switch-group">
+                            <div class="switch-label">
+                                <div class="switch-label-text">Push Notifications</div>
+                                <div class="switch-label-desc">Get push notifications for important updates</div>
+                            </div>
+                            <div class="toggle-switch active" onclick="toggleSwitch(this, 'pushNotifications')" id="pushNotificationsToggle"></div>
+                        </div>
+                        <div class="separator"></div>
+                        <div class="switch-group">
+                            <div class="switch-label">
+                                <div class="switch-label-text">Budget Alerts</div>
+                                <div class="switch-label-desc">Notify me when I'm close to budget limits</div>
+                            </div>
+                            <div class="toggle-switch active" onclick="toggleSwitch(this, 'budgetAlerts')" id="budgetAlertsToggle"></div>
+                        </div>
+                        <div class="separator"></div>
+                        <div style="padding-top: 12px;">
+                            <label class="label">Alert Frequency</label>
+                            <div class="button-group">
+                                <!-- Added onclick handlers and IDs for frequency selection -->
+                                <button type="button" class="button button-outline" id="freq-daily" onclick="selectFrequency('daily')">Daily</button>
+                                <button type="button" class="button button-outline" id="freq-weekly" onclick="selectFrequency('weekly')">Weekly</button>
+                                <button type="button" class="button button-outline" id="freq-monthly" onclick="selectFrequency('monthly')">Monthly</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Tab -->
+            <div id="security" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Change Password</div>
+                        <div class="card-description">Update your password to keep your account secure</div>
+                    </div>
+                    <div class="card-content">
+                        <form class="form-space">
+                            <div class="form-group">
+                                <label class="label">Current Password</label>
+                                <div class="password-input-wrapper">
+                                    <input type="password" class="input" placeholder="Enter current password" id="currentPassword">
+                                    <!-- Replaced emoji with Flaticon -->
+                                    <button type="button" class="password-toggle-btn" onclick="togglePasswordVisibility('currentPassword')"><i class="fi fi-rr-eye"></i></button>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="label">New Password</label>
+                                <input type="password" class="input" placeholder="Enter new password">
+                            </div>
+                            <div class="form-group">
+                                <label class="label">Confirm New Password</label>
+                                <input type="password" class="input" placeholder="Confirm new password">
+                            </div>
+                            <div class="button-flex-end">
+                                <button type="button" class="button" onclick="changePassword()">Change Password</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Two-Factor Authentication</div>
+                        <div class="card-description">Add an extra layer of security to your account</div>
+                    </div>
+                    <div class="card-content">
+                        <div class="icon-box">
+                            <!-- Replaced emoji with Flaticon -->
+                            <div class="icon-box-icon"><i class="fi fi-rr-shield-check"></i></div>
+                            <div class="icon-box-content">
+                                <div class="icon-box-title">2FA Status</div>
+                                <div class="icon-box-desc">Currently disabled</div>
+                            </div>
+                            <button type="button" class="button button-outline">Enable 2FA</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data & Privacy Tab -->
+            <div id="data" class="tab-content">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Data Management</div>
+                        <div class="card-description">Export, import, or delete your financial data</div>
+                    </div>
+                    <div class="card-content form-space">
+                        <div class="icon-box">
+                            <!-- Replaced emoji with Flaticon -->
+                            <div class="icon-box-icon"><i class="fi fi-rr-download"></i></div>
+                            <div class="icon-box-content">
+                                <div class="icon-box-title">Export Data</div>
+                                <div class="icon-box-desc">Download all your data in JSON format</div>
+                            </div>
+                            <div class="icon-box-action">
+                                <button type="button" class="button button-outline" onclick="exportData()">Export</button>
+                            </div>
+                        </div>
+
+                        <div class="icon-box">
+                            <!-- Replaced emoji with Flaticon -->
+                            <div class="icon-box-icon"><i class="fi fi-rr-upload"></i></div>
+                            <div class="icon-box-content">
+                                <div class="icon-box-title">Import Data</div>
+                                <div class="icon-box-desc">Restore data from a backup file</div>
+                            </div>
+                            <div class="icon-box-action">
+                                <input type="file" id="importFile" accept=".json" style="display: none;" onchange="importData(event)">
+                                <button type="button" class="button button-outline" onclick="document.getElementById('importFile').click()">Import</button>
+                            </div>
+                        </div>
+
+                        <div class="separator"></div>
+
+                        <div class="icon-box destructive">
+                            <!-- Replaced emoji with Flaticon -->
+                            <div class="icon-box-icon" style="color: #ef4444;"><i class="fi fi-rr-trash"></i></div>
+                            <div class="icon-box-content">
+                                <div class="icon-box-title" style="color: #ef4444;">Delete All Data</div>
+                                <div class="icon-box-desc">Permanently remove all your financial data</div>
+                            </div>
+                            <div class="icon-box-action">
+                                <button type="button" class="button button-destructive" onclick="clearAllData()">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">Storage Usage</div>
+                        <div class="card-description">Monitor your storage usage</div>
+                    </div>
+                    <div class="card-content">
+                        <div class="storage-item">
+                            <span>Transactions</span>
+                            <span class="badge" id="transactionCount">0 items</span>
+                        </div>
+                        <div class="storage-item">
+                            <span>Budgets</span>
+                            <span class="badge" id="budgetCount">0 items</span>
+                        </div>
+                        <div class="storage-item">
+                            <span>Receipts</span>
+                            <span class="badge" id="receiptCount">0 items</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/store.js"></script>
+    <script src="../js/settings.js"></script>
+</body>
+</html>

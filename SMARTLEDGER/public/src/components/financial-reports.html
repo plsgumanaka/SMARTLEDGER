@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Financial Reports</title>
+    <!-- Added Flaticon CDN -->
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/2.1.0/uicons-regular-rounded/css/uicons-regular-rounded.css'>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <link rel="stylesheet" href="../css/financial-reports.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div class="header-content">
+                <h1>Financial Reports</h1>
+                <p>Detailed analysis of your financial performance</p>
+            </div>
+            <div class="header-actions">
+                <!-- replaced dropdown with two simple export buttons -->
+                <button class="btn btn-secondary" onclick="exportPDF()">⬇ Export PDF</button>
+                <button class="btn btn-secondary" onclick="exportReport('csv')">⬇ Export CSV</button>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-section">
+            <div class="filters-grid">
+                <div class="filter-group">
+                    <label class="filter-label">Report Type</label>
+                    <div class="custom-dropdown-wrapper" data-select="reportTypeSelect">
+                        <select class="filter-select" id="reportTypeSelect" onchange="handleReportTypeChange()">
+                            <option value="monthly">Monthly Summary</option>
+                            <option value="category">Category Breakdown</option>
+                            <option value="trend">Trend Analysis</option>
+                        </select>
+                        <div class="custom-dropdown-trigger">
+                            <span>Monthly Summary</span>
+                            <!-- Replaced arrow with Flaticon -->
+                            <span class="dropdown-arrow"><i class="fi fi-rr-angle-small-down"></i></span>
+                        </div>
+                        <div class="custom-dropdown-menu" id="reportTypeMenu"></div>
+                    </div>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Period</label>
+                    <div class="custom-dropdown-wrapper" data-select="periodSelect">
+                        <select class="filter-select" id="periodSelect" onchange="updateReport()">
+                        </select>
+                        <div class="custom-dropdown-trigger">
+                            <span>Select Period</span>
+                            <!-- Replaced arrow with Flaticon -->
+                            <span class="dropdown-arrow"><i class="fi fi-rr-angle-small-down"></i></span>
+                        </div>
+                        <div class="custom-dropdown-menu" id="periodMenu"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Monthly Summary Report -->
+        <div id="monthly" class="report-content active">
+            <!-- Removed summary-grid-wrapper and summary-card-wrapper to allow summary cards to align with other cards -->
+            <div class="summary-content" id="monthlySummaryContent">
+                <!-- Universal card content will be rendered here -->
+            </div>
+
+            <div class="card">
+                <div class="card-title">6-Month Income vs Expenses</div>
+                <div class="chart-container">
+                    <canvas id="monthlyChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Wrapped Top Expenses and Savings in two-col-layout for side-by-side display -->
+            <div class="two-col-layout">
+                <div class="card">
+                    <div class="card-title">Top 5 Expense Categories</div>
+                    <div id="topExpensesContainer"></div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Savings Trend</div>
+                    <div class="chart-container">
+                        <canvas id="savingsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Income & Expense Summary</div>
+                <div class="two-col-layout">
+                    <div>
+                        <div style="margin-bottom: 16px; font-weight: 600;">Income Sources</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Source</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="incomeSourcesTable"></tbody>
+                        </table>
+                    </div>
+                    <div>
+                        <div style="margin-bottom: 16px; font-weight: 600;">Expense Breakdown</div>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Category</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody id="expenseBreakdownTable"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Category Breakdown Report -->
+        <div id="category" class="report-content">
+            <!-- Removed summary-grid-wrapper and summary-card-wrapper to allow summary cards to align with other cards -->
+            <div class="summary-content" id="categorySummaryContent">
+                <!-- Universal card content will be rendered here -->
+            </div>
+
+            <!-- Wrapped the two charts in a two-column layout container -->
+            <div class="two-col-layout">
+                <div class="card">
+                    <div class="card-title">Expense Distribution</div>
+                    <div class="chart-container">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-title">Category Details</div>
+                    <div id="categoryDetailsContainer"></div>
+                </div>
+            </div>
+
+            <!-- Category Spending Overview now appears below as full-width -->
+            <div class="card">
+                <div class="card-title">Category Spending Overview</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Amount</th>
+                            <th>% of Total</th>
+                            <th>Transactions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="categoryTableContainer"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Trend Analysis Report -->
+        <div id="trend" class="report-content">
+            <!-- Removed summary-grid-wrapper and summary-card-wrapper to allow summary cards to align with other cards -->
+            <div class="summary-content" id="trendSummaryContent">
+                <!-- Universal card content will be rendered here -->
+            </div>
+
+            <div class="card">
+                <div class="card-title">Income & Expense Trends - Last 6 Months</div>
+                <div class="chart-container">
+                    <canvas id="trendChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Month-over-Month Comparison</div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Month</th>
+                            <th>Income</th>
+                            <th>Expenses</th>
+                            <th>Savings</th>
+                            <th>Change %</th>
+                        </tr>
+                    </thead>
+                    <tbody id="trendTableContainer"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/financial-reports.js"></script>
+</body>
+</html>

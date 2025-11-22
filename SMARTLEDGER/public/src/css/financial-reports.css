@@ -1,0 +1,464 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: rgb(40, 36, 61);
+    color: #e0e0e7;
+    padding: 32px;
+}
+
+/* Added .fi utility class */
+.fi {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    vertical-align: middle;
+}
+
+.container {
+    max-width: 1400px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.header-content h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    color: #e0e0e7;
+}
+
+.header-content p {
+    font-size: 14px;
+    color: #9ca3af;
+}
+
+.header-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.btn {
+    border: none;
+    border-radius: 8px;
+    padding: 10px 16px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-secondary {
+    background: transparent;
+    color: #e0e0e7;
+    border: 1px solid rgba(168, 85, 247, 0.1);
+}
+
+.btn-secondary:hover {
+    background: rgba(168, 85, 247, 0.05);
+}
+
+.filter-section {
+    background: rgb(49, 45, 75);
+    border-radius: 8px;
+    padding: 16px 24px;
+    border: 1px solid rgba(168, 85, 247, 0.1);
+    transition: all 0.3s;
+}
+
+.filter-section:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    border-color: #4a4a5e;
+}
+
+.filters-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+}
+
+.filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    position: relative;
+    z-index: 10;
+}
+
+.filter-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+}
+
+.custom-dropdown-wrapper {
+    position: relative;
+}
+
+.filter-select {
+    display: none;
+}
+
+.custom-dropdown-trigger {
+    background: rgb(30, 30, 46);
+    border: 1px solid rgba(168, 85, 247, 0.1);
+    border-radius: 6px;
+    padding: 10px 12px;
+    color: #e0e0e7;
+    font-size: 14px;
+    cursor: pointer;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s;
+}
+
+.custom-dropdown-trigger:hover {
+    background-color: rgb(35, 35, 55);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    border-color: #4a4a5e;
+}
+
+.custom-dropdown-trigger.active {
+    border-color: #a855f7;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+}
+
+.dropdown-arrow {
+    font-size: 12px;
+    color: #9ca3af;
+    transition: transform 0.3s;
+    /* Ensure icon aligns properly */
+    display: flex;
+    align-items: center;
+}
+
+.custom-dropdown-trigger.active .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.custom-dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: rgb(30, 30, 46);
+    border: 1px solid rgba(168, 85, 247, 0.2);
+    border-top: none;
+    border-radius: 0 0 6px 6px;
+    margin-top: -1px;
+    z-index: 9999;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.custom-dropdown-menu::-webkit-scrollbar {
+    width: 8px;
+}
+
+.custom-dropdown-menu::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.custom-dropdown-menu::-webkit-scrollbar-thumb {
+    background: #a855f7;
+    border-radius: 4px;
+}
+
+.custom-dropdown-menu.open {
+    display: block;
+}
+
+.dropdown-option {
+    padding: 10px 12px;
+    color: #e0e0e7;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s;
+    border-bottom: 1px solid rgba(168, 85, 247, 0.05);
+}
+
+.dropdown-option:hover {
+    background: rgba(168, 85, 247, 0.1);
+}
+
+.dropdown-option.selected {
+    background: rgba(168, 85, 247, 0.15);
+    color: #a855f7;
+}
+
+.dropdown-checkmark {
+    color: #a855f7;
+    font-size: 14px;
+    display: none;
+}
+
+.dropdown-option.selected .dropdown-checkmark {
+    /* Changed to inline-flex for icon */
+    display: inline-flex;
+}
+
+.card {
+    background: rgb(49, 45, 75);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid rgba(168, 85, 247, 0.1);
+    transition: all 0.3s;
+    margin-bottom: 24px;
+}
+
+.card:last-child {
+    margin-bottom: 0;
+}
+
+.card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    border-color: #4a4a5e;
+}
+
+.card-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #e0e0e7;
+    margin-bottom: 16px;
+}
+
+.summary-grid-wrapper {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+.summary-card-wrapper {
+    background: rgb(49, 45, 75);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid rgba(168, 85, 247, 0.1);
+    transition: all 0.3s;
+}
+
+.summary-card-wrapper:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    border-color: #4a4a5e;
+}
+
+.summary-content {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 24px;
+    /* Added margin-bottom to maintain spacing after summary cards */
+    margin-bottom: 24px;
+}
+
+.summary-card {
+    background: rgb(49, 45, 75);
+    border-radius: 12px;
+    padding: 24px;
+    border: 1px solid rgba(168, 85, 247, 0.1);
+    transition: all 0.3s;
+    /* Changed display from hidden to block, cards always show */
+    display: block;
+}
+
+.summary-card.active {
+    display: block; /* Show when active */
+}
+
+.summary-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    border-color: #4a4a5e;
+}
+
+.summary-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: #9ca3af;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.summary-value {
+    font-size: 24px;
+    font-weight: 700;
+    color: #e0e0e7;
+    margin-bottom: 4px;
+}
+
+.summary-value.income {
+    color: #22c55e;
+}
+
+.summary-value.expense {
+    color: #ef4444;
+}
+
+.summary-value.savings {
+    color: #a855f7;
+}
+
+.summary-detail {
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+.chart-container {
+    position: relative;
+    height: 300px;
+    margin-bottom: 0;
+}
+
+.category-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    background: rgba(168, 85, 247, 0.05);
+}
+
+.category-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+.category-info {
+    flex: 1;
+}
+
+.category-name {
+    font-size: 14px;
+    font-weight: 600;
+    color: #e0e0e7;
+}
+
+.category-percentage {
+    font-size: 12px;
+    color: #9ca3af;
+}
+
+.category-amount {
+    font-size: 14px;
+    font-weight: 600;
+    color: #ef4444;
+}
+
+/* removed max-height and overflow to make Category Details compact */
+#categoryDetailsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead {
+    border-bottom: 1px solid rgba(168, 85, 247, 0.1);
+}
+
+th {
+    padding: 12px 16px;
+    text-align: left;
+    color: #9ca3af;
+    font-weight: 600;
+    font-size: 12px;
+}
+
+td {
+    padding: 12px 16px;
+    border-bottom: 1px solid rgba(168, 85, 247, 0.05);
+    color: #e0e0e7;
+    font-size: 13px;
+}
+
+tr:hover {
+    background: rgba(168, 85, 247, 0.05);
+}
+
+.report-content {
+    display: none;
+}
+
+.report-content.active {
+    display: block;
+}
+
+.two-col-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    margin-bottom: 32px;
+}
+
+@media (max-width: 768px) {
+    .header {
+        flex-direction: column;
+        gap: 16px;
+    }
+
+    .filters-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .chart-container {
+        height: 250px;
+    }
+
+    .header-actions {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .header-actions .btn {
+        width: 100%;
+    }
+
+    .two-col-layout {
+        grid-template-columns: 1fr;
+        margin-bottom: 32px;
+    }
+}
+
+/* Update for summary-card-wrapper */
+.summary-card-wrapper {
+    background: transparent;
+    border-radius: 12px;
+    padding: 20px;
+    border: none;
+    transition: all 0.3s;
+}
+
+.summary-card-wrapper:hover {
+    box-shadow: none;
+    border-color: transparent;
+}

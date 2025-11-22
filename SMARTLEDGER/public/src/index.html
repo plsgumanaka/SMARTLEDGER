@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartLedger</title>
+    <!-- Added favicon using the new logo -->
+    <link rel="icon" type="image/png" href="/logo.png">
+    <!-- Added Flaticon UIcons CDN -->
+    <link rel='stylesheet' href='https://cdn-uicons.flaticon.com/uicons-regular-rounded/css/uicons-regular-rounded.css'>
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+    <!-- Added toast container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <!-- Loader Overlay -->
+    <div class="loader-overlay" id="loaderOverlay">
+        <div class="loader-container">
+            <div class="loader"></div>
+            <div class="loader-text">Refreshing...</div>
+        </div>
+    </div>
+
+    <!-- Search Modal -->
+    <div class="search-modal-overlay" id="searchModal" onclick="closeSearchModal(event)">
+        <div class="search-modal">
+            <div class="search-modal-header">
+                <i class="fi fi-rr-search"></i>
+                <input type="text" placeholder="Search transactions, budgets, or navigate..." id="modalSearchInput" autocomplete="off">
+                <span class="esc-badge">ESC</span>
+            </div>
+            <div class="search-modal-body">
+                <div class="search-section-title">Quick Navigation</div>
+                <div class="search-results" id="searchResults">
+                    <!-- Items injected via JS -->
+                </div>
+            </div>
+            <div class="search-modal-footer">
+                <div class="footer-hint"><span class="key">↑</span><span class="key">↓</span> Navigate</div>
+                <div class="footer-hint"><span class="key">Enter</span> Select</div>
+                <div class="footer-hint"><span class="key">ESC</span> Close</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <aside class="sidebar">
+            <div class="sidebar-logo">
+                <!-- Replaced the icon with the new logo image -->
+                <div class="sidebar-logo-icon">
+                    <img src="../assets/icons/logo.png" alt="SmartLedger Logo">
+                </div>
+                <!-- Updated logo text structure to match Materio style -->
+                <div class="sidebar-logo-text">SMARTLEDGER</div>
+            </div>
+            <ul class="sidebar-menu">
+                <li class="menu-item">
+                    <!-- Removed the badge and restored the simple link structure -->
+                    <a href="#" class="menu-link active" data-page="components/dashboard.html">
+                        <span class="menu-icon"><i class="fi fi-rr-dashboard"></i></span>
+                        <span>Dashboards</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link" data-page="components/transactions.html">
+                        <!-- Replaced emoji with Flaticon edit icon -->
+                        <span class="menu-icon"><i class="fi fi-rr-edit"></i></span>
+                        <span>Transactions</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link" data-page="components/budget.html">
+                        <!-- Replaced emoji with Flaticon briefcase icon -->
+                        <span class="menu-icon"><i class="fi fi-rr-briefcase"></i></span>
+                        <span>Budget Planner</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link" data-page="components/ai-insight.html">
+                        <!-- Replaced emoji with Flaticon search icon -->
+                        <span class="menu-icon"><i class="fi fi-rr-search"></i></span>
+                        <span>AI Insights</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link" data-page="components/financial-reports.html">
+                        <!-- Replaced emoji with Flaticon chart icon -->
+                        <span class="menu-icon"><i class="fi fi-rr-chart-histogram"></i></span>
+                        <span>Reports</span>
+                    </a>
+                </li>
+                <li class="menu-item">
+                    <a href="#" class="menu-link" data-page="components/receipt.html">
+                        <!-- Replaced emoji with Flaticon upload icon -->
+                        <span class="menu-icon"><i class="fi fi-rr-upload"></i></span>
+                        <span>Upload Receipt</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-bottom">
+                <ul class="sidebar-footer-menu">
+                    <li class="menu-item">
+                        <a href="#" class="menu-link" data-page="components/Settings.html">
+                            <!-- Replaced emoji with Flaticon settings icon -->
+                            <span class="menu-icon"><i class="fi fi-rr-settings"></i></span>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                    <li class="menu-item">
+                        <a href="#" class="menu-link" data-page="components/HelpSupport.html">
+                            <!-- Replaced emoji with Flaticon help icon -->
+                            <span class="menu-icon"><i class="fi fi-rr-interrogation"></i></span>
+                            <span>Help & Support</span>
+                        </a>
+                    </li>
+                </ul>
+
+                <div class="user-profile-section">
+                    <div class="user-avatar-sidebar">JD</div>
+                    <div class="user-info">
+                        <div class="user-name">John Doe</div>
+                        <div class="user-email">john.doe@email.com</div>
+                    </div>
+                </div>
+
+                <div class="sidebar-version">
+                    <div>Version 1.0.0</div>
+                    <div>© 2025</div>
+                </div>
+            </div>
+        </aside>
+
+        <div class="main-content">
+            <header class="header">
+                <div class="header-left">
+                    <!-- Replaced emoji with Flaticon menu icon -->
+                    <button class="mobile-menu-btn" onclick="toggleMobileMenu()"><i class="fi fi-rr-menu-burger"></i></button>
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <h2 id="page-title" style="font-size: 20px; font-weight: 700; color: #e0e0e7; margin: 0; white-space: nowrap;">Dashboard</h2>
+                            <span style="display: inline-flex; align-items: center; gap: 4px; background: rgba(16, 185, 129, 0.1); border: 1px solid rgba(16, 185, 129, 0.3); color: #10b981; font-size: 12px; padding: 4px 8px; border-radius: 12px; white-space: nowrap;">
+                                <!-- Replaced emoji with Flaticon trend icon -->
+                                <i class="fi fi-rr-chart-line-up"></i> ₱12,450.00
+                            </span>
+                        </div>
+                        <p style="font-size: 12px; color: #9ca3af; margin: 4px 0 0 0; display: none;" id="current-date"></p>
+                    </div>
+                </div>
+
+                <div class="header-right">
+                    <div class="search-bar" onclick="openSearchModal()">
+                        <input type="text" placeholder="Search transactions..." readonly style="cursor: pointer;">
+                        <!-- Replaced emoji with Flaticon search icon -->
+                        <span><i class="fi fi-rr-search"></i></span>
+                    </div>
+
+                    <div style="position: relative;">
+                            <button class="quick-actions-btn" onclick="toggleQuickActions()">
+                            <!-- Replaced emoji with Flaticon plus icon -->
+                            <i class="fi fi-rr-plus"></i> <span style="display: none; lg:inline;">Quick Add</span>
+                        </button>
+                        <div class="quick-actions-menu" id="quickActionsMenu">
+                            <div>Quick Actions</div>
+                            <!-- Replaced emojis with Flaticon icons in quick actions -->
+                            <button onclick="navigateTo('components/transactions.html')"><i class="fi fi-rr-edit"></i> Add Transaction</button>
+                            <button onclick="navigateTo('components/budget.html')"><i class="fi fi-rr-target"></i> Create Budget</button>
+                            <button onclick="navigateTo('components/receipt.html')"><i class="fi fi-rr-upload"></i> Upload Receipt</button>
+                            <hr>
+                            <button onclick="navigateTo('components/financial-reports.html')"><i class="fi fi-rr-download"></i> Export Reports</button>
+                        </div>
+                    </div>
+
+                    <!-- Replaced emoji with Flaticon refresh icon -->
+                    <button class="refresh-btn" title="Refresh Data" onclick="refreshData()"><i class="fi fi-rr-refresh"></i></button>
+
+                    <!-- Replaced emoji with Flaticon moon icon -->
+                    <button class="theme-toggle-btn" id="themeToggle" title="Toggle Theme" onclick="toggleTheme()"><i class="fi fi-rr-moon"></i></button>
+
+                    <div class="separator"></div>
+
+                    <div style="position: relative;">
+                        <button class="notifications-btn" onclick="toggleNotifications()" title="Notifications">
+                            <!-- Replaced emoji with Flaticon bell icon -->
+                            <i class="fi fi-rr-bell"></i>
+                            <span id="notificationBadge">5</span>
+                        </button>
+                        <div class="notifications-menu" id="notificationsMenu">
+                            <div>
+                                <h3>Notifications</h3>
+                                <span id="notificationCount">5 new</span>
+                            </div>
+                            <div class="notifications-list" id="notificationsList">
+                                <!-- Notifications will be rendered dynamically via JavaScript -->
+                            </div>
+                            <div class="notifications-footer">
+                                <button class="mark-all-read-btn" onclick="markAllAsRead()">Mark all as read</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div style="position: relative;">
+                        <button class="user-menu-btn" onclick="toggleUserMenu()">JD</button>
+                        <div class="user-menu" id="userMenu">
+                            <div class="user-menu-header">
+                                <div class="user-menu-avatar">JD</div>
+                                <div class="user-menu-info">
+                                    <p class="user-menu-name">John Doe</p>
+                                    <p class="user-menu-email">john.doe@email.com</p>
+                                </div>
+                            </div>
+                            <div class="user-menu-list">
+                                <!-- Removed Profile link and updated structure -->
+                                <button class="user-menu-item" onclick="navigateTo('components/Settings.html')">
+                                    <i class="fi fi-rr-settings"></i> Settings
+                                </button>
+                                <button class="user-menu-item" onclick="navigateTo('components/HelpSupport.html')">
+                                    <i class="fi fi-rr-interrogation"></i> Help & Support
+                                </button>
+                                <hr>
+                                <button class="user-menu-item logout" onclick="logout()">
+                                    <i class="fi fi-rr-sign-out-alt"></i> Logout
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="content-frame">
+                <iframe id="content-iframe" src="components/dashboard.html"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/index.js"></script>
+</body>
+</html>
